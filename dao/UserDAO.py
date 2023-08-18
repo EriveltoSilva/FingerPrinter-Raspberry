@@ -2,25 +2,51 @@ import json
 from models.UserModel import UserModel
 
 class UserDAO:
-    def __init__(self):
-        self.filename = 'db/users.json'
-
+    def __init__(self, filename='db/users.json'):
+        self.filename = filename
+        # self.filename = 'db/users.json'
+        
     def create(self, user_model):
-        user = [{"id":user_model.get_id(), "name":user_model.get_name(), "type":user_model.get_type(), "function":user_model.get_function()}]
+        user = [user_model]
         with open(self.filename) as users_temp:
             users_loaded = json.load(users_temp)
         users_updated = users_loaded + user
 
         with open(self.filename, 'w') as users_readed:
             json.dump(users_updated, users_readed, indent=6)
-
+    
+    def delete(self, id):
+        with open(self.filename) as users_temp:
+            users_loaded = json.load(users_temp)
+            for user in users_loaded:
+                if id == user['id']:
+                    users_loaded.remove(user)
+                    with open(self.filename, 'w') as users_readed:
+                        json.dump(users_loaded, users_readed, indent=6)
+                        return True
+        return False
+    
     def find(self, id):
         with open(self.filename) as usersTemp:
             users = json.load(usersTemp)
             for user in users:
                 if id == user['id']:
                     return user
-        return False
+        return None
+    
+
+    def to_string(self, id):
+        with open(self.filename) as usersTemp:
+            users = json.load(usersTemp)
+            for user in users:
+                if id == user['id']:
+                    text = f'Id:{user["id"]}'.center(42)
+                    text += f'Nome:{user["name"]}'
+                    text += f'Type:{user["type"]}'
+                    text += f'Function:{user["function"]}'
+                    return text
+        return None
+
 
     def find_all(self):
         with open(self.filename) as usersTemp:
@@ -37,16 +63,7 @@ class UserDAO:
             print('*' * 42)
 
 
-    def delete(self, id):
-        with open(self.filename) as users_temp:
-            users_loaded = json.load(users_temp)
-            for user in users_loaded:
-                if id == user['id']:
-                    users_loaded.remove(user)
-                    with open('db/users.json', 'w') as users_readed:
-                        json.dump(users_loaded, users_readed, indent=6)
-                        return True
-        return False
+    
 
     def is_admin(self, id):
         with open(self.filename) as usersTemp:
@@ -63,3 +80,12 @@ class UserDAO:
                 if id == user['id']:
                     return True
         return False
+    
+    def get_id(self, name):
+        name = name.upper()
+        with open(self.filename) as usersTemp:
+            users = json.load(usersTemp)
+            for user in users:
+                if name == user['name']:
+                    return user['id']
+        return -1

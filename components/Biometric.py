@@ -56,9 +56,10 @@ class Biometric:
             accuracyScore = result[1]
 
             if ( positionNumber >= 0 ):
-                print('## Está Pessoa já se encontra Registrada, com o ID:{0}'.format(positionNumber))
+                error_text = ('## Está Pessoa já se encontra Registrada, com o ID:{0}'.format(positionNumber))
+                print(error_text)
                 self.buzzer.alarm()
-                return
+                return error_text
     
             print('## Retire o Dedo... ##')
             self.buzzer.bip()
@@ -70,10 +71,11 @@ class Biometric:
             self.f.convertImage(FINGERPRINT_CHARBUFFER2)
             #self.f.convertImage(0x02)
             if(self.f.compareCharacteristics() == 0 ):
-                util.error('## Os Dedos não Concidem..\n## Verifique se colocou o mesmo dedo, ou se posicionou da mesma maneira ##')
+                error_text = '## Os Dedos não Concidem..\n## Verifique se colocou o mesmo dedo, ou se posicionou da mesma maneira ##'
+                util.error(error_text)
                 self.buzzer.alarm()
                 sleep(MIDDLE_TIME)
-                return
+                return error_text
             
             self.f.createTemplate()
             positionNumber = f.storeTemplate()
@@ -83,52 +85,63 @@ class Biometric:
             util.change_color()
             self.buzzer.alarm()
             sleep(MIDDLE_TIME)
+            return positionNumber
     
         except Exception as e:
-            util.error('Erro na Operação.\nErro:'+ str(e))
-            exit(1)
+            error_text = ('Erro na Operação.\nErro:'+ str(e))
+            util.erro(error_text)
+            # exit(1)
+            return error_text
     
     
     def find_finger(self):
         try:
             print('## Esperando alguem inserir um dedo no sensor... ##')
             self.buzzer.bip()
-            while ( self.f.readImage() == False ):
+            while self.f.readImage() == False :
                 pass
             
             #self.f.convertImage(0x01)
             self.f.convertImage(FINGERPRINT_CHARBUFFER1)
             
-            result = f.searchTemplate()
+            result = self.f.searchTemplate()
             positionNumber = result[0]
             accurancyScore = result[1]
             
-            if ( positionNumber == -1 ):
+            if positionNumber == -1 :
                 print('## Ups! Pessoa não Encontrada! ##')
                 print('## Tente posicionar melhor o dedo ##')
                 self.buzzer.alarm()
                 sleep(MIDDLE_TIME)
-                return
+                
             else:
                 print('## Pessoa Encontrada ##')
                 print('## ID:'+ str(positionNumber))
                 self.buzzer.alarm()
-        
+            return positionNumber
         except Exception as e:
-            print('Erro na Operação.\nErro:'+ str(e))
-            exit(1)
+            error_text = ('Erro na Operação.\nErro:'+ str(e))
+            print(error_text)
+            return error_text
 
 
-    def delete_finger(self):
+    def delete_finger(self, id):
         try:
-            positionNumber = int(input('Insira o ID da pessoa a remover:'))
+            # positionNumber = int(input('Insira o ID da pessoa a remover:'))
+            positionNumber = id
             if(self.f.deleteTemplate(positionNumber) == True):
                 util.change_color('green')
                 util.header('Pessoa Delectada com Sucesso!')
                 util.change_color()
+                return True
+            else:
+                util.error('Pessoa Não Encontrada')
+                return False
         except Exception as e:
-            util.error('Falha Delectando Usuario.\nFalha:'+str(e))
-            exit(1)
+            error_text = ('Falha Delectando Usuario.\nFalha:'+str(e)) 
+            util.error(error_text)
+            return error_text
+        
         '''
         positionNumber = 0
         count = 0
