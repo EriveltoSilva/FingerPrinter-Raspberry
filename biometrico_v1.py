@@ -58,13 +58,13 @@ def alarm():
     GPIO.output(BUZZER, GPIO.HIGH)
     time.sleep(3)
     GPIO.output(BUZZER, GPIO.LOW)
-    
+
+
 def enroll_finger():
     change_color('blue')
     header("## Registo de uma Nova Pessoa ##")
     bip()
     change_color()
-    
     
     ## Tries to search the finger and calculate hash
     try:
