@@ -1,0 +1,20 @@
+[
+      {
+            "id": 1,
+            "type": "ADMIN",
+            "name": "ERIVELTO",
+            "function": "TECNICO"
+      },
+      {
+            "id": 2,
+            "type": "USER",
+            "name": "HELIO",
+            "function": "TECNICO"
+      },
+      {
+            "id": 3,
+            "name": "l",
+            "type": "f",
+            "function": "a"
+      }
+]
