@@ -1,10 +1,17 @@
-from dao.UserDAO import UserDAO
-from models.UserModel import UserModel
+import RPi.GPIO as GPIO
+from time import sleep
 
-user_model = UserModel(3)
-#user_model.read_user_datas()
+from components.LED import LED
+from components.Buzzer import Buzzer
+from components.Biometric import Biometric
 
-user_dao = UserDAO()
-user = user_dao.find(user_model.get_id())
-if user:
-    print(user)
+MY_LED = 17
+MY_BUZZER = 27
+
+
+GPIO.setmode(GPIO.BCM)
+GPIO.setwarnings(False)
+
+led = LED(MY_LED)
+buzzer = Buzzer(MY_BUZZER)
+finger = Biometric()

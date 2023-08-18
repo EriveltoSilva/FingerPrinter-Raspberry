@@ -43,7 +43,7 @@ except Exception as e:
 
 
 #---------------Functions Declarations and Definitions-----------
-def get_number_finger_registed():
+def get_number_finger_registered():
     return f.getTemplateCount()
 
 def get_total_finger_capacity():
