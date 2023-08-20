@@ -10,7 +10,6 @@ def alert(text):
     print('\033[m', end='')
 
 def file_exists(filename):
-    filename = filename.upper()
     try:
         file = open(filename, 'rt')
         file.close()
@@ -20,12 +19,11 @@ def file_exists(filename):
         return True
 
 def create_file(filename):
-    filename = filename.upper()
     try:
         file = open(filename, 'wt+')
         file.close()
-    except:
-        alert("ERRO CRIANDO O ARQUIVO DE DB")
+    except Exception as e:
+        alert(f'ERRO CRIANDO O ARQUIVO DE DB{e}')
         return False
     else:
         print(f'\033[32mARQUIVO {filename} CRIADO COM SUCESSO!\033[m')
@@ -33,11 +31,10 @@ def create_file(filename):
 
 
 def read_file(filename):
-    filename = filename.upper()
     try:
         file = open(filename, 'rt')
-    except:
-        alert(f"ERRO AO LER O ARQUIVO {filename}!")
+    except Exception as e:
+        alert(f'ERRO AO LER O ARQUIVO {filename}\nErro:{e}!')
         return False
     else:
         text = file.read()
@@ -46,19 +43,18 @@ def read_file(filename):
 
 
 def write_in_file(filename, text):
-    filename = filename.upper()
     try:
         # file = open(filename, 'wt+')
         file = open(filename, 'a')
         file.write(text+str('\n'))
         file.close()
-    except:
+    except Exception as e:
+        alert(f'ERRO AO ESCREVER NO ARQUIVO {filename}\nErro:{e}')
         return False
     else:
         return True
     
 def append_in_file(filename, text):
-    filename = filename.upper()
     try:
         file = open(filename, 'a')
         file.write(text)
@@ -71,7 +67,6 @@ def append_in_file(filename, text):
 
 
 def json_model(filename):
-    filename = filename.upper()
     if not file_exists(filename):
         if create_file(filename)==True :
             user_admin= [{"id": 999,"name" : "ADMIN","type":"ADMIN","function":"ADMIN"}]

@@ -1,9 +1,11 @@
-import RPi.gpio as GPIO
+import RPi.GPIO as GPIO
 from time import sleep
 
 class LED:
-    def __init__(self, pin_gpio):
+    def __init__(self, pin_gpio, BCM_ACTIVE=True):
         self.PIN = pin_gpio
+        if BCM_ACTIVE == True:
+            GPIO.setmode(GPIO.BCM)
         GPIO.setup(self.PIN, GPIO.OUT)
         GPIO.output(self.PIN, GPIO.HIGH)
 
@@ -24,3 +26,20 @@ class LED:
             sleep(interval)
             GPIO.output(self.PIN, GPIO.LOW)
             sleep(interval)
+
+
+
+#-------------- Test ----------------------------
+#print('LED SYSTEM RUNNING...')
+#led = LED(17)
+#led.blink(50, 0.1)
+#led.set_status('HIGH')
+#sleep(5)
+#led.set_status('LOW')
+#print(led.get_status())
+#sleep(2)
+#led.set_status()
+#sleep(3)
+#print(led.get_status())
+#GPIO.cleanup()
+#print("\033[31mSystem Finished!\033[m")

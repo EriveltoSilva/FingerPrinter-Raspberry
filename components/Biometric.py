@@ -78,7 +78,7 @@ class Biometric:
                 return error_text
             
             self.f.createTemplate()
-            positionNumber = f.storeTemplate()
+            positionNumber = self.f.storeTemplate()
             util.change_color('green')
             print('## Pessoa Registrada com Sucesso! ##')
             print('## ID:'+str(positionNumber))
@@ -89,7 +89,7 @@ class Biometric:
     
         except Exception as e:
             error_text = ('Erro na Operação.\nErro:'+ str(e))
-            util.erro(error_text)
+            util.error(error_text)
             # exit(1)
             return error_text
     
