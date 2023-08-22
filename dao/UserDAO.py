@@ -19,7 +19,7 @@ class UserDAO:
         with open(self.filename) as users_temp:
             users_loaded = json.load(users_temp)
             for user in users_loaded:
-                if id == user['id']:
+                if id == user['id'] and id!=999:
                     users_loaded.remove(user)
                     with open(self.filename, 'w') as users_readed:
                         json.dump(users_loaded, users_readed, indent=6)
@@ -81,11 +81,14 @@ class UserDAO:
                     return True
         return False
     
-    def get_id(self, name):
+    def get_id_by_name(self, name):
         name = name.upper()
+        print('Entrou na procura...')
         with open(self.filename) as usersTemp:
             users = json.load(usersTemp)
             for user in users:
+                print(f"{user['name']}")
                 if name == user['name']:
+                    print('Achou')
                     return user['id']
         return -1

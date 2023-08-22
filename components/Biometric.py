@@ -12,17 +12,33 @@ MIDDLE_TIME = 2
 
 class Biometric:
     
-    def __init__(self, buzzer):
+    def __init__(self, buzzer, canvas, device):
         self.buzzer = buzzer
+        self.canvas = canvas
+        self.device = device
+        
         try:
             self.f = PyFingerprint('/dev/ttyS0', 57600, 0xFFFFFFFF, 0x00000000)
             if ( self.f.verifyPassword() == False ):
-                raise ValueError('The given fingerprint sensor password is wrong!')
-
+                with self.canvas(self.device) as draw:
+                    draw.rectangle(self.device.bounding_box, outline="white", fill="black")
+                    draw.text((0,10), '#####################', fill="blue")
+                    draw.text((0,20), '#       ERRO        #', fill="blue")
+                    draw.text((0,30), '#   INICIALIZANDO   #', fill="blue")
+                    draw.text((0,40), '#     O SENSOR      #', fill="blue")
+                    draw.text((0,50), '#CHECK AS LIGAÇÕES  #', fill="blue")
+                                
         except Exception as e:
             print('Falha na Inicialização do Sensor FingerPrint!')
             print('Falha: ' + str(e))
-            exit(1)
+            with self.canvas(self.device) as draw:
+                draw.rectangle(self.device.bounding_box, outline="white", fill="black")
+                draw.text((0,10), '#####################', fill="blue")
+                draw.text((0,20), '#       ERRO        #', fill="blue")
+                draw.text((0,30), '#   INICIALIZANDO   #', fill="blue")
+                draw.text((0,40), '#     O SENSOR      #', fill="blue")
+                draw.text((0,50), '#CHECK AS LIGAÇÕES  #', fill="blue")
+                        
 
     def get_number_finger_registered(self):
         return self.f.getTemplateCount()
@@ -36,35 +52,64 @@ class Biometric:
         util.header("## Registo de uma Nova Pessoa ##")
         self.buzzer.bip()
         util.change_color()
-        
-        ## Tries to search the finger and calculate hash
+        with self.canvas(self.device) as draw:
+                draw.rectangle(self.device.bounding_box, outline="white", fill="black")
+                draw.text((0,10), '#####################', fill="blue")
+                draw.text((0,20), '# OPCAO 1 ESCOLHIDA #', fill="blue")
+                draw.text((0,30), '# REGISTRO DE NOVA  #', fill="blue")
+                draw.text((0,40), '#      PESSOA       #', fill="blue")
+                draw.text((0,50), '#####################', fill="blue")
         try:
             util.print_center('## Insira o Dedo no Sensor... ##')
+            with self.canvas(self.device) as draw:
+                draw.rectangle(self.device.bounding_box, outline="white", fill="black")
+                draw.text((0,10), '#####################', fill="blue")
+                draw.text((0,20), '#     REGISTRO      #', fill="blue")
+                draw.text((0,30), '# INSIRA O DEDO NO  #', fill="blue")
+                draw.text((0,40), '#      SENSOR       #', fill="blue")
+                draw.text((0,50), '#####################', fill="blue")
             self.buzzer.bip()
-
             while ( self.f.readImage() == False ):
                 pass
-
-            ## Converts read image to characteristics and stores it in charbuffer 1
             self.f.convertImage(FINGERPRINT_CHARBUFFER1)
-            #self.f.convertImage(0x01)
-
-            ## Searches template
             result = self.f.searchTemplate()
-
             positionNumber = result[0]
             accuracyScore = result[1]
-
             if ( positionNumber >= 0 ):
                 error_text = ('## Está Pessoa já se encontra Registrada, com o ID:{0}'.format(positionNumber))
                 print(error_text)
-                self.buzzer.alarm()
-                return error_text
-    
+                with self.canvas(self.device) as draw:
+                    draw.rectangle(self.device.bounding_box, outline="white", fill="black")
+                    draw.text((0,0), '#####################', fill="blue")
+                    draw.text((0,10),'#     REGISTRO      #', fill="blue")
+                    draw.text((0,20),'#    ESTA PESSOA    #', fill="blue")
+                    draw.text((0,40),'#  JA SE ENCONTRA   #', fill="blue")
+                    draw.text((0,30),'#     REGISTRADA    #', fill="blue")
+                    draw.text((0,50),'#####################', fill="blue")
+                    self.buzzer.alarm()
+                    return {"status":"error", "message":error_text, "data":-1}
+        
             print('## Retire o Dedo... ##')
-            self.buzzer.bip()
+            with self.canvas(self.device) as draw:
+                draw.rectangle(self.device.bounding_box, outline="white", fill="black")
+                draw.text((0,0), '#####################', fill="blue")
+                draw.text((0,10),'#                   #', fill="blue")
+                draw.text((0,20),'#     REGISTRO      #', fill="blue")
+                draw.text((0,30),'#   RETIRE O DEDO   #', fill="blue")
+                draw.text((0,40),'#       ###         #', fill="blue")
+                draw.text((0,50),'#####################', fill="blue")
+            self.buzzer.alarm()
             sleep(MIDDLE_TIME)
             print('## Insira o Mesmo Dedo no Sensor... ##')
+            with self.canvas(self.device) as draw:
+                draw.rectangle(self.device.bounding_box, outline="white", fill="black")
+                draw.text((0,0), '#####################', fill="blue")
+                draw.text((0,10),'#     REGISTRO      #', fill="blue")
+                draw.text((0,20),'#  INSIRA O MESMO   #', fill="blue")
+                draw.text((0,30),'#       DEDO        #', fill="blue")
+                draw.text((0,40),'#    NO SENSOR      #', fill="blue")
+                draw.text((0,50),'#####################', fill="blue")
+            
             self.buzzer.bip()
             while ( self.f.readImage() == False):
                 pass
@@ -73,9 +118,18 @@ class Biometric:
             if(self.f.compareCharacteristics() == 0 ):
                 error_text = '## Os Dedos não Concidem..\n## Verifique se colocou o mesmo dedo, ou se posicionou da mesma maneira ##'
                 util.error(error_text)
+                with self.canvas(self.device) as draw:
+                    draw.rectangle(self.device.bounding_box, outline="white", fill="black")
+                    draw.text((0,0), '#####################', fill="blue")
+                    draw.text((0,10),'#     REGISTRO      #', fill="blue")
+                    draw.text((0,20),'#   ERRO LENDO AS   #', fill="blue")
+                    draw.text((0,30),'#  DIGITAIS DO DEDO #', fill="blue")
+                    draw.text((0,40),'#   TENTE DE NOVO   #', fill="blue")
+                    draw.text((0,50),'#####################', fill="blue")
+                    
                 self.buzzer.alarm()
                 sleep(MIDDLE_TIME)
-                return error_text
+                return {"status":"error", "message":error_text, "data":-1}
             
             self.f.createTemplate()
             positionNumber = self.f.storeTemplate()
@@ -83,46 +137,15 @@ class Biometric:
             print('## Pessoa Registrada com Sucesso! ##')
             print('## ID:'+str(positionNumber))
             util.change_color()
-            self.buzzer.alarm()
-            sleep(MIDDLE_TIME)
-            return positionNumber
+            return {"status":"success", "message":"success", "data": positionNumber}
+        
     
         except Exception as e:
             error_text = ('Erro na Operação.\nErro:'+ str(e))
             util.error(error_text)
             # exit(1)
-            return error_text
-    
-    
-    def find_finger(self):
-        try:
-            print('## Esperando alguem inserir um dedo no sensor... ##')
-            self.buzzer.bip()
-            while self.f.readImage() == False :
-                pass
-            
-            #self.f.convertImage(0x01)
-            self.f.convertImage(FINGERPRINT_CHARBUFFER1)
-            
-            result = self.f.searchTemplate()
-            positionNumber = result[0]
-            accurancyScore = result[1]
-            
-            if positionNumber == -1 :
-                print('## Ups! Pessoa não Encontrada! ##')
-                print('## Tente posicionar melhor o dedo ##')
-                self.buzzer.alarm()
-                sleep(MIDDLE_TIME)
-                
-            else:
-                print('## Pessoa Encontrada ##')
-                print('## ID:'+ str(positionNumber))
-                self.buzzer.alarm()
-            return positionNumber
-        except Exception as e:
-            error_text = ('Erro na Operação.\nErro:'+ str(e))
-            print(error_text)
-            return error_text
+            return {"status":"error", "message":error_text, "data":-1}
+
 
 
     def delete_finger(self, id):
@@ -130,17 +153,37 @@ class Biometric:
             # positionNumber = int(input('Insira o ID da pessoa a remover:'))
             positionNumber = id
             if(self.f.deleteTemplate(positionNumber) == True):
-                util.change_color('green')
-                util.header('Pessoa Delectada com Sucesso!')
-                util.change_color()
-                return True
+                return {"status":"success", "message":"success", "data":True}
             else:
                 util.error('Pessoa Não Encontrada')
-                return False
+                return {"status":"success", "message":"Digital Não Encontrada", "data":False}        
         except Exception as e:
-            error_text = ('Falha Delectando Usuario.\nFalha:'+str(e)) 
-            util.error(error_text)
-            return error_text
+            error_text = f'Falha Delectando Usuario.\nFalha:{e}' 
+            return {"status":"error", "message":error_text, "data":False}
+
+
+
+    def find_finger(self):
+        try:
+            print('## Esperando alguem inserir um dedo no sensor... ##')
+            while self.f.readImage() == False :
+                pass
+            self.f.convertImage(FINGERPRINT_CHARBUFFER1)
+            result = self.f.searchTemplate()
+            positionNumber = result[0]
+            accurancyScore = result[1]
+            if positionNumber == -1 :
+                error_text = '## Ups! Pessoa não encontrada ##\n## Tente posicionar melhor o dedo ##'
+                print(error_text)
+                return {"status":"success", "message":error_text, "data":-1}
+            else:
+                print(f'## Pessoa Encontrada ##\n# ID:{positionNumber}')
+                return {"status":"success", "message":"Pessoa Não Encontrada", "data":positionNumber}
+        except Exception as e:
+            error_text = (f'Erro na Operação.\nErro{e}')
+            print(error_text)
+            return {"status":"error", "message":error_text, "data":-1}
+
         
         '''
         positionNumber = 0

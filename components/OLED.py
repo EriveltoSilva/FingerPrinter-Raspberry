@@ -16,9 +16,16 @@ class OLED:
             for text in texts:
                 draw.text((5,y), text, fill="white")
                 y +=10
+                
+    def print(self,x, y, text):
+        with canvas(self.device) as draw:
+            draw.rectangle(self.device.bounding_box, outline="white", fill="black")
+            draw.text((x,y), text, fill="white")
+                            
 
+if __name__ == '__main__':
 
-print('SYSTEM ON...')
-oled = OLED()
-oled.paint(['Erivelto', 'Clenio', 'Da' ,'Costa', 'E', 'Silva'])
-sleep(5)
+    print('SYSTEM ON...')
+    oled = OLED()
+    oled.paint(['Erivelto', 'Clenio', 'Da' ,'Costa', 'E', 'Silva'])
+    sleep(5)

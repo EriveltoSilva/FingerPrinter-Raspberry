@@ -1,20 +1,14 @@
 [
       {
-            "id": 1,
+            "id": 999,
+            "name": "ADMIN",
             "type": "ADMIN",
-            "name": "ERIVELTO",
-            "function": "TECNICO"
+            "function": "ADMIN"
       },
       {
-            "id": 2,
-            "type": "USER",
-            "name": "HELIO",
+            "id": 0,
+            "name": "CLENIO",
+            "type": "ADMIN",
             "function": "TECNICO"
-      },
-      {
-            "id": 3,
-            "name": "l",
-            "type": "f",
-            "function": "a"
       }
 ]
