@@ -1,6 +1,4 @@
 import json
-# import datetime
-
 
 def alert(text):
     print('\033[31m', end='')
@@ -77,21 +75,14 @@ def json_model(filename):
     else: 
         print('\033[31mO FICHEIRO JSON JA EXISTE\033[m'.center(42))
 
-
-#print(read_file('erivelto.txt'))
-# print(write_in_file('erivelto.txt', f'1*Erivelto*{datetime.datetime.now()}'))
-# print(write_in_file('bank.json', f'{}'))
-# print(append_in_file('erivelto.txt', f'2*Clenio*{datetime.datetime.now()}'))
-# print(append_in_file('erivelto.txt', f'3*Costa*{datetime.datetime.now()}'))
-# print(write_in_file('erivelto.txt', f'1*Erivelto*{datetime.datetime.now()}'))
-
-# print('Running...')
-# print(datetime.date.today())
-# print(datetime.datetime.now())
-# print(datetime.datetime.today())
-
-# if not file_exists('erivelto.json'):
-#     if create_file('erivelto.json')==True :
-#         print('FICHEIRO CRIADO'.center(42))   
-# else: 
-#     print('\033[31mO FICHEIRO JA EXISTE\033[m'.center(42))   
+def get_sheet_data(filename):
+    try:
+      
+        file = open(filename, 'rt')
+    except Exception as e:
+        alert(f'ERRO AO LER O ARQUIVO {filename}\nErro:{e}!')
+        return []
+    else:
+        text = file.read()
+        return text
+  
