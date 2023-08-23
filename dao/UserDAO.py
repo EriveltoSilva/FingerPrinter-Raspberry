@@ -1,5 +1,4 @@
 import json
-from models.UserModel import UserModel
 
 class UserDAO:
     def __init__(self, filename='db/users.json'):
