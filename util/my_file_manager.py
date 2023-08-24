@@ -1,3 +1,4 @@
+import os
 import json
 
 def alert(text):
@@ -64,10 +65,10 @@ def append_in_file(filename, text):
         return True
 
 
-def json_model(filename):
+def json_model(filename, id):
     if not file_exists(filename):
         if create_file(filename)==True :
-            user_admin= [{"id": 999,"name" : "ADMIN","type":"ADMIN","function":"ADMIN"}]
+            user_admin= [{"id": id,"name" : "ADMIN","type":"ADMIN","function":"ADMIN"}]
             json_object = json.dumps(user_admin, indent = 6) 
             with open(filename, "w") as outfile:
                 outfile.write(json_object)
@@ -75,9 +76,16 @@ def json_model(filename):
     else: 
         print('\033[31mO FICHEIRO JSON JA EXISTE\033[m'.center(42))
 
+
+def delete_json_model(filename):
+    if os.path.exists(filename):
+        os.remove(filename)
+    else:
+        print('\033[31mFICHEIRO JSON NÃO ENCONTRADO! IMPOSSIVEL EMOVER\033[m'.center(42))
+
+
 def get_sheet_data(filename):
     try:
-      
         file = open(filename, 'rt')
     except Exception as e:
         alert(f'ERRO AO LER O ARQUIVO {filename}\nErro:{e}!')

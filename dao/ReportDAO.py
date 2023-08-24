@@ -16,7 +16,7 @@ class ReportDAO:
         day = datetime.date.today().day
         month = datetime.date.today().month
         year = datetime.date.today().year
-        time = datetime.date.today() 
+        time = datetime.datetime.now().time() 
         dow = days_of_week[datetime.date.today().weekday()]
         #ID | Name | Type | Function | DIA | MES | ANO | HORARIO
         text = f'{user["id"]}*{user["name"]}*{user["type"]}*{user["function"]}*{dow}*{day}*{month}*{year}*{time}'
@@ -29,7 +29,7 @@ class ReportDAO:
         months_of_year = ['JANEIRO', 'FEVEREIRO', 'MARÇO', 'ABRIL', 'MAIO', 'JUNHO', 'JULHO', 'AGOSTO', 'SETEMBRO',
                           'OUTUBRO', 'NOVEMBRO', 'DEZEMBRO']
 
-        filename = f'db/reports/RELATORIO-DE-{months_of_year[month]}-{datetime.date.today().year}.txt'
+        filename = f'db/reports/RELATORIO-DE-{months_of_year[month]}-{year}.txt'
         response = my_file_manager.get_sheet_data(filename)
         if(len(response)>0):
             lines = response.split("\n")

@@ -50,7 +50,7 @@ class Biometric:
     def enroll_finger(self):
         util.change_color('blue')
         util.header("## Registo de uma Nova Pessoa ##")
-        self.buzzer.bip()
+        
         util.change_color()
         with self.canvas(self.device) as draw:
                 draw.rectangle(self.device.bounding_box, outline="white", fill="black")
@@ -59,12 +59,14 @@ class Biometric:
                 draw.text((0,30), '# REGISTRO DE NOVA  #', fill="blue")
                 draw.text((0,40), '#      PESSOA       #', fill="blue")
                 draw.text((0,50), '#####################', fill="blue")
+        self.buzzer.bip()
+        sleep(2)
         try:
             util.print_center('## Insira o Dedo no Sensor... ##')
             with self.canvas(self.device) as draw:
                 draw.rectangle(self.device.bounding_box, outline="white", fill="black")
                 draw.text((0,10), '#####################', fill="blue")
-                draw.text((0,20), '#     REGISTRO      #', fill="blue")
+                draw.text((0,20), '#   REGISTRANDO     #', fill="blue")
                 draw.text((0,30), '# INSIRA O DEDO NO  #', fill="blue")
                 draw.text((0,40), '#      SENSOR       #', fill="blue")
                 draw.text((0,50), '#####################', fill="blue")
@@ -81,7 +83,7 @@ class Biometric:
                 with self.canvas(self.device) as draw:
                     draw.rectangle(self.device.bounding_box, outline="white", fill="black")
                     draw.text((0,0), '#####################', fill="blue")
-                    draw.text((0,10),'#     REGISTRO      #', fill="blue")
+                    draw.text((0,10),'#      REGISTRO     #', fill="blue")
                     draw.text((0,20),'#    ESTA PESSOA    #', fill="blue")
                     draw.text((0,40),'#  JA SE ENCONTRA   #', fill="blue")
                     draw.text((0,30),'#     REGISTRADA    #', fill="blue")
@@ -150,7 +152,6 @@ class Biometric:
 
     def delete_finger(self, id):
         try:
-            # positionNumber = int(input('Insira o ID da pessoa a remover:'))
             positionNumber = id
             if(self.f.deleteTemplate(positionNumber) == True):
                 return {"status":"success", "message":"success", "data":True}
@@ -160,6 +161,18 @@ class Biometric:
         except Exception as e:
             error_text = f'Falha Delectando Usuario.\nFalha:{e}' 
             return {"status":"error", "message":error_text, "data":False}
+            
+    def delete_all(self):
+        try:
+            capacity = self.f.getStorageCapacity()
+            for id in range(capacity):               
+                self.f.deleteTemplate(id)
+            return {"status":"success", "message":"success", "data":True}
+                    
+        except Exception as e:
+            error_text = f'Falha Delectando Todos os Usuarios.\nFalha:{e}' 
+            return {"status":"error", "message":error_text, "data":False}
+        
 
 
 

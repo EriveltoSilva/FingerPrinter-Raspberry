@@ -1,14 +1,8 @@
 [
       {
-            "id": 999,
+            "id": 0,
             "name": "ADMIN",
             "type": "ADMIN",
             "function": "ADMIN"
-      },
-      {
-            "id": 0,
-            "name": "CLENIO",
-            "type": "ADMIN",
-            "function": "TECNICO"
       }
 ]

@@ -30,7 +30,7 @@ class Keyboard:
 		#GPIO.add_event_detect(self.COLUMN1, GPIO.FALLING, callback=self.key_pressed, bouncetime=100)
 
 		
-	def key_wait_pressed(self):
+	def wait_key_pressed(self):
 		while True:				
 			GPIO.output(self.LINE1, GPIO.LOW)
 			if GPIO.input(self.COLUMN1) == 0:
@@ -95,7 +95,7 @@ class Keyboard:
 				return '#'
 			GPIO.output(self.LINE4, GPIO.HIGH)
 			
-			return ''
+		return ''
 			 
 
 	      
