@@ -11,22 +11,29 @@ class SpreadSheetGenerator:
     def generate_spread_sheet(self, registers, filename=None):
         book = openpyxl.Workbook()
         for register in registers:
-            if len(register) > 5:
-                DAY_SHEET =f'{register[4]}-{register[5]}'
+            if len(register) > 4:
+                DAY_SHEET =f'{register[3]}-{register[4]}'
                 if DAY_SHEET not in book.sheetnames:
                     book.create_sheet(DAY_SHEET)
                     page = book[DAY_SHEET]
-                    page.append(['ID', 'Nome', 'Tipo', 'Função', 'DoW','Dia', 'Mês', 'Ano', 'Horario'])
+                    page.append(['ID', 'Num Mecanografico', 'Tipo','DoW','Dia', 'Mês', 'Ano', 'Horario'])
                 else:
                     page = book[DAY_SHEET]
                 page.append(register)
-        if filename==None:
-            book.save(f'reports/{self.SPREAD_SHEET_FILENAME}')
-        else:
-            book.save(f'{filename}/{self.SPREAD_SHEET_FILENAME}')
-        
+        try:
+            if filename==None:
+                book.save(f'reports/{self.SPREAD_SHEET_FILENAME}')
+            else:
+                book.save(f'{filename}/{self.SPREAD_SHEET_FILENAME}')
+            return True
+        except Exception as e:
+            return False
 
 if __name__ == '__main__':
 
     spread_sheet_generator = SpreadSheetGenerator()
     spread_sheet_generator.generate_spread_sheet(7)
+
+
+
+

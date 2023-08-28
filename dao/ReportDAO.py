@@ -18,8 +18,8 @@ class ReportDAO:
         year = datetime.date.today().year
         time = datetime.datetime.now().time() 
         dow = days_of_week[datetime.date.today().weekday()]
-        #ID | Name | Type | Function | DIA | MES | ANO | HORARIO
-        text = f'{user["id"]}*{user["name"]}*{user["type"]}*{user["function"]}*{dow}*{day}*{month}*{year}*{time}'
+        #ID | Numero Mecano.. | Type | DIA_SEMANA | DIA | MES | ANO | HORARIO
+        text = f'{user["id"]}*{user["num_mec"]}*{user["type"]}*{dow}*{day}*{month}*{year}*{time}'
         if my_file_manager.append_in_file(self.REPORT_NAME, text) == True:
             util.change_color('green')
             util.print_center('REGISTRO INSERIDO!')

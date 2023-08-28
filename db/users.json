@@ -1,8 +1,12 @@
 [
       {
             "id": 0,
-            "name": "ADMIN",
-            "type": "ADMIN",
-            "function": "ADMIN"
+            "num_mec": 999,
+            "type": "ADMIN"
+      },
+      {
+            "id": 2,
+            "num_mec": "123",
+            "type": "FUNCIONARIO"
       }
 ]

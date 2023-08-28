@@ -1,3 +1,4 @@
+import os
 import getpass
 import RPi.GPIO as GPIO
 
@@ -20,6 +21,7 @@ from components.SpreadSheetGenerator import SpreadSheetGenerator
 
 
 
+
 #---------- OLED Initialization ---------------
 serial = i2c(port=1, address=0x3C)
 device = sh1106(serial)
@@ -39,7 +41,7 @@ MENU_LOGOUT = 6
 MENU_TURN_OFF = 7 
 menu_options=[MENU_REGISTER, MENU_LIST_USERS, MENU_DELETE, MENU_FINGER, MENU_SPREAD_SHEET,MENU_LOGOUT, MENU_TURN_OFF]
 
-
+DELAY=2
 
 GPIO.setmode(GPIO.BCM)
 GPIO.setwarnings(False)
@@ -49,6 +51,31 @@ buzzer = Buzzer(MY_BUZZER, False)
 keyboard = Keyboard([5,6,13,19],[26,16,20], False)
 finger = Biometric(buzzer=buzzer, canvas=canvas, device=device)
 
+def get_num_mec():
+    global buzzer
+    global keyboard
+    global canvas
+    global device
+    digit = ''
+    num=''
+    
+    while len(num)<3 or digit!='#':
+        with canvas(device) as draw:
+            draw.rectangle(device.bounding_box, outline="white", fill="black")
+            draw.text((0,0), '#####################', fill="blue")
+            draw.text((0,10),'#       NUMERO      #', fill="blue")
+            draw.text((0,20),'#    MECANOGRAFICO  #', fill="blue")
+            draw.text((0,30),'#NOTA: 3 DIGITOS    #', fill="blue")
+            draw.text((0,40),f'#DIGITE O NUMERO:{num}  ', fill="blue")
+            draw.text((0,50),'#####################', fill="blue")
+        buzzer.bip()
+        digit = keyboard.wait_key_pressed()
+        if(digit.isnumeric()):
+            num +=digit 
+        elif digit=='*':
+            num = ''        
+    return num
+    
 util.header('SISTEMA DE PONTEIRO BIOMETRICO')
 with canvas(device) as draw:
     draw.rectangle(device.bounding_box, outline="white", fill="black")
@@ -123,7 +150,7 @@ try:
                     draw.text((0,30),'#   DOS USUARIOS    #', fill="blue")
                     draw.text((0,40),'#        ###        #', fill="blue")
                     draw.text((0,50),'#####################', fill="blue")
-                buzzer.alarm(3)
+                buzzer.alarm(2)
             option = MENU_TURN_OFF
         
         
@@ -165,9 +192,9 @@ try:
                     draw.text((0,40),'#                   #', fill="blue")
                     draw.text((0,50),'#####################', fill="blue")
                 buzzer.alarm()
-                sleep(3)
+                sleep(DELAY)
                 
-        elif(option==1):
+        elif(option==MENU_REGISTER):
             response = finger.enroll_finger()
             if response['status'] == 'success':
                 with canvas(device) as draw:
@@ -176,20 +203,34 @@ try:
                     draw.text((0,10),'##### REGISTRO ######', fill="blue")
                     draw.text((0,20),'#     DIGITAIS      #', fill="blue")
                     draw.text((0,30),'#    REGISTRADAS    #', fill="blue")
+       
                     draw.text((0,40),'#   COM SUCCESSO!   #', fill="blue")
                     draw.text((0,50),'#####################', fill="blue")
                 buzzer.alarm()
-                sleep(3)
+                sleep(DELAY)
                 
                 id = response['data']
-                name = input('Digite o Nome da Pessoa:')
-                if(input('ESTE USUARIO DEVE SER ADMIN?[S/N]:').upper() == 'S'):
+                
+                num_mec = get_num_mec()
+                util.header(f'Retornou:{num_mec}')
+                
+                with canvas(device) as draw:
+                    draw.rectangle(device.bounding_box, outline="white", fill="black")
+                    draw.text((0,0), '#####################', fill="blue")
+                    draw.text((0,10),'##### REGISTRO ######', fill="blue")
+                    draw.text((0,20),'DEVE SER ADMIN?      ', fill="blue")
+                    draw.text((0,30),'  *-NÃO              ', fill="blue")
+                    draw.text((0,40),'  #-SIM              ', fill="blue")
+                    draw.text((0,50),'#####################', fill="blue")
+                buzzer.bip()
+                
+                
+                if(keyboard.wait_key_pressed().upper() == '#'):
                     type_user ='ADMIN'
                 else:
                     type_user = 'FUNCIONARIO'
                     
-                function = input('Digite a sua Função na Empresa:')
-                user_dao.create({ "id":id, "name":name.upper(), "type":type_user.upper(), "function":function.upper()})
+                user_dao.create({ "id":id, "num_mec":num_mec, "type":type_user.upper()})
                 option = MENU_FINGER
             else:
                 util.error(response['message'])
@@ -202,8 +243,8 @@ try:
                     draw.text((0,40),'#                   #', fill="blue")
                     draw.text((0,50),'#####################', fill="blue")
                 buzzer.alarm()
-                sleep(3)
             option = MENU_FINGER
+        
         elif(option==MENU_LIST_USERS):
             with canvas(device) as draw:
                     draw.rectangle(device.bounding_box, outline="white", fill="black")
@@ -214,12 +255,13 @@ try:
                     draw.text((0,40),'#   NESTA VERSÃO    #', fill="blue")
                     draw.text((0,50),'#####################', fill="blue")
             buzzer.bip()
-            sleep(2)
+            sleep(DELAY)
             option = MENU_FINGER 
+        
         elif(option==MENU_DELETE):
-            name = input("Digite o nome:").upper()
-            print(name)
-            id = user_dao.get_id_by_name(name)
+            num_mec = get_num_mec()
+            print(num_mec)
+            id = user_dao.get_id_by_num_mec(num_mec)
             print(f'ID:{id}')
             if id != -1: 
                 response = finger.delete_finger(id)
@@ -234,7 +276,7 @@ try:
                         draw.text((0,40),'#    A DIGITAL      #', fill="blue")
                         draw.text((0,50),'#####################', fill="blue")
                     buzzer.bip()
-                    sleep(3)
+                    sleep(DELAY)
                 elif response['status'] =='success' and response['data'] == True:
                     util.change_color('green')
                     util.print_center('PESSOA DELECTADA!')
@@ -252,7 +294,7 @@ try:
                     else:
                         util.print_center('Usuario apagado do Json')
                     buzzer.bip()
-                    sleep(3)
+                    sleep(DELAY)
                     
                 elif response['status'] =='success' and response['data'] == False:
                     util.change_color('green')
@@ -267,7 +309,7 @@ try:
                         draw.text((0,40),'#                   #', fill="blue")
                         draw.text((0,50),'#####################', fill="blue")
                     buzzer.bip()
-                    sleep(3)
+                    sleep(DELAY)
                 option = MENU_FINGER
         elif(option==MENU_FINGER):
             with canvas(device) as draw:
@@ -292,7 +334,7 @@ try:
                     draw.text((0,40),'#    A DIGITAL      #', fill="blue")
                     draw.text((0,50),'#####################', fill="blue")
                 buzzer.bip(0.8)
-                sleep(3)
+                sleep(DELAY)
             else:
                 if response['status']=='success' and response['data']==-1:
                     util.error('PESSOA NÃO DETECTADA!')
@@ -305,7 +347,7 @@ try:
                         draw.text((0,40),'#                   #', fill="blue")
                         draw.text((0,50),'#####################', fill="blue")
                     buzzer.bip(0.8)
-                    sleep(3)
+                    sleep(DELAY)
                 elif response['status'] == 'success' and response['data']>=0:
                     user = user_dao.find(response['data'])
                     if user == None:
@@ -318,10 +360,15 @@ try:
                             draw.text((0,10),'#     IMPRESSÃO     #', fill="blue")
                             draw.text((0,20),'#     DETECTADA     #', fill="blue")
                             draw.text((0,30),'#        OLA        #', fill="blue")
-                            draw.text((0,40),f"{user['name']:^21}", fill="blue")
+                            if(user['type']!='ADMIN'):
+                                t =f"Nº{user['num_mec']}"
+                                draw.text((0,40),f'{t:^21}', fill="blue")
+                            else:    
+                                draw.text((0,40),'#       ADMIN       #', fill="blue")
                             draw.text((0,50),'#####################', fill="blue")
                         buzzer.bip(0.8)
-                        sleep(3)
+                        sleep(DELAY)
+                        
                         if(user['type']=='ADMIN'):
                             with canvas(device) as draw:
                                 draw.rectangle(device.bounding_box, outline="white", fill="black")
@@ -346,7 +393,7 @@ try:
                 draw.text((0,40),'#                   #', fill="blue")
                 draw.text((0,50),'#####################', fill="blue")
             buzzer.bip()
-            sleep(2)
+            sleep(DELAY)
             with canvas(device) as draw:
                 draw.rectangle(device.bounding_box, outline="white", fill="black")
                 draw.text((0,0), '#####################', fill="blue")
@@ -356,7 +403,7 @@ try:
                 draw.text((0,40),'#                   #', fill="blue")
                 draw.text((0,50),'#####################', fill="blue")
             buzzer.bip()
-            sleep(2)
+            sleep(DELAY)
             with canvas(device) as draw:
                 draw.rectangle(device.bounding_box, outline="white", fill="black")
                 draw.text((0,0), '1-JANEIRO  2-FEVEREI', fill="blue")
@@ -377,30 +424,52 @@ try:
                     draw.text((0,30),'#REGISTROS GUARDADOS#', fill="blue")
                     draw.text((0,40),'#     DESTE MES     #', fill="blue")
                     draw.text((0,50),'#####################', fill="blue")
-                buzzer.alarm(3)
+                buzzer.alarm()
             else:
-                spread_sheet_generator = SpreadSheetGenerator()
-                spread_sheet_generator.generate_spread_sheet(resp, f'/home/{getpass.getuser()}/Downloads')
-                with canvas(device) as draw:
-                        draw.rectangle(device.bounding_box, outline="white", fill="black")
-                        draw.text((0,0), '#####################', fill="blue")
-                        draw.text((0,10),'#  EXTRATO MENSAL   #', fill="blue")
-                        draw.text((0,20),'#     RETIRADO      #', fill="blue")
-                        draw.text((0,30),'#       COM         #', fill="blue")
-                        draw.text((0,40),'#     SUCCESSO!     #', fill="blue")
-                        draw.text((0,50),'#####################', fill="blue")
-                buzzer.alarm(4)
-                with canvas(device) as draw:
-                        draw.rectangle(device.bounding_box, outline="white", fill="black")
-                        draw.text((0,0), '#####################', fill="blue")
-                        draw.text((0,10),'# PRESSIONE QUALQUER#', fill="blue")
-                        draw.text((0,20),'#    TECLA PARA     #', fill="blue")
-                        draw.text((0,30),'#     CONTINUAR     #', fill="blue")
-                        draw.text((0,40),'#        ###        #', fill="blue")
-                        draw.text((0,50),'#####################', fill="blue")
-                keyboard.wait_key_pressed()
+                pendrive_path = my_file_manager.get_report_path()
+                if pendrive_path!= None:
+                    spread_sheet_generator = SpreadSheetGenerator()
+                    if spread_sheet_generator.generate_spread_sheet(resp, pendrive_path) == True:
+                        with canvas(device) as draw:
+                                draw.rectangle(device.bounding_box, outline="white", fill="black")
+                                draw.text((0,0), '#####################', fill="blue")
+                                draw.text((0,10),'#  EXTRATO MENSAL   #', fill="blue")
+                                draw.text((0,20),'#     RETIRADO      #', fill="blue")
+                                draw.text((0,30),'#       COM         #', fill="blue")
+                                draw.text((0,40),'#     SUCCESSO!     #', fill="blue")
+                                draw.text((0,50),'#####################', fill="blue")
+                        buzzer.alarm(3)
+                        with canvas(device) as draw:
+                                draw.rectangle(device.bounding_box, outline="white", fill="black")
+                                draw.text((0,0), '#####################', fill="blue")
+                                draw.text((0,10),'# PRESSIONE QUALQUER#', fill="blue")
+                                draw.text((0,20),'#    TECLA PARA     #', fill="blue")
+                                draw.text((0,30),'#     CONTINUAR     #', fill="blue")
+                                draw.text((0,40),'#        ###        #', fill="blue")
+                                draw.text((0,50),'#####################', fill="blue")
+                        keyboard.wait_key_pressed()
+                    else:
+                        with canvas(device) as draw:
+                            draw.rectangle(device.bounding_box, outline="white", fill="black")
+                            draw.text((0,0), '#####################', fill="blue")
+                            draw.text((0,10),'# ERRO GRAVANDO NA  #', fill="blue")
+                            draw.text((0,20),'#     PENDRIVE!     #', fill="blue")
+                            draw.text((0,30),'#VERIFIQUE O ESPAÇO #', fill="blue")
+                            draw.text((0,40),'#    E PERMISSÕES   #', fill="blue")
+                            draw.text((0,50),'#####################', fill="blue")
+                        buzzer.alarm(3)
+                else:
+                    with canvas(device) as draw:
+                            draw.rectangle(device.bounding_box, outline="white", fill="black")
+                            draw.text((0,0), '#####################', fill="blue")
+                            draw.text((0,10),'#  ERRO LOCALIZANDO #', fill="blue")
+                            draw.text((0,20),'#     A PENDRIVE    #', fill="blue")
+                            draw.text((0,30),'# VERIFIQUE SE ESTÁ #', fill="blue")
+                            draw.text((0,40),'#    BEM INSERIDA   #', fill="blue")
+                            draw.text((0,50),'#####################', fill="blue")
+                    buzzer.alarm(3)
+            
             option = MENU_FINGER
-                
         elif option == 6:
             option = MENU_FINGER
             
@@ -415,6 +484,6 @@ util.header('## Programa Encerrando... ##')
 with canvas(device) as draw:
     draw.rectangle(device.bounding_box, outline="white", fill="black")
     draw.text((0,25), '#PROGRAMA ENCERRANDO#', fill="white")
-sleep(2)
+sleep(DELAY)
 GPIO.cleanup()
                         

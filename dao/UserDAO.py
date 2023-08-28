@@ -40,9 +40,8 @@ class UserDAO:
             for user in users:
                 if id == user['id']:
                     text = f'Id:{user["id"]}'.center(42)
-                    text += f'Nome:{user["name"]}'
+                    text += f'Num Mec:{user["num_mec"]}'
                     text += f'Type:{user["type"]}'
-                    text += f'Function:{user["function"]}'
                     return text
         return None
 
@@ -55,9 +54,8 @@ class UserDAO:
             for user in users:
                 print(f'User [{i}]'.center(42))
                 print(f'Id:{user["id"]}')
-                print(f'Nome:{user["name"]}')
+                print(f'Num Mec:{user["num_mec"]}')
                 print(f'Type:{user["type"]}')
-                print(f'Function:{user["function"]}')
                 i += 1
             print('*' * 42)
 
@@ -80,14 +78,13 @@ class UserDAO:
                     return True
         return False
     
-    def get_id_by_name(self, name):
-        name = name.upper()
+    def get_id_by_num_mec(self, num_mec):
+        num_mec = num_mec.upper()
         print('Entrou na procura...')
         with open(self.filename) as usersTemp:
             users = json.load(usersTemp)
             for user in users:
-                print(f"{user['name']}")
-                if name == user['name']:
-                    print('Achou')
+                print(f"{user['num_mec']}")
+                if num_mec == user['num_mec']:
                     return user['id']
         return -1

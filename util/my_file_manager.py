@@ -1,5 +1,6 @@
 import os
 import json
+import getpass
 
 def alert(text):
     print('\033[31m', end='')
@@ -68,8 +69,8 @@ def append_in_file(filename, text):
 def json_model(filename, id):
     if not file_exists(filename):
         if create_file(filename)==True :
-            user_admin= [{"id": id,"name" : "ADMIN","type":"ADMIN","function":"ADMIN"}]
-            json_object = json.dumps(user_admin, indent = 6) 
+            user_admin= [{"id": id,"num_mec" : 999,"type":"ADMIN"}]
+            json_object = json.dumps(user_admin, indent = 5) 
             with open(filename, "w") as outfile:
                 outfile.write(json_object)
                 print('FICHEIRO JSON CRIADO'.center(42))   
@@ -94,3 +95,15 @@ def get_sheet_data(filename):
         text = file.read()
         return text
   
+def get_report_path():
+    try:
+        moint_point = f'/media/{getpass.getuser()}'
+        pendrives = os.listdir(moint_point)
+        if len(pendrives)>0:
+            return f'{moint_point}/{pendrives[0]}/'
+        return None
+    except Exception as e:
+        print(f'Erro:{e}')
+    return None
+
+

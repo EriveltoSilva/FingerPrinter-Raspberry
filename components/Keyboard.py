@@ -172,13 +172,18 @@ if __name__ == '__main__':
 	try:
 		print('System running...')
 		GPIO.setmode(GPIO.BCM)
+		GPIO.setwarnings(False)
 		led = LED(17, False)
 		keyboard = Keyboard([5,6,13,19],[26,16,20], False)
 		while True:
-			key = keyboard.key_pressed()
-			if key != None:
-				print(key)
-			sleep(0.1)
+			led.set_status('HIGH')
+			sleep(1)
+			led.set_status('LOW')
+			sleep(0.5)
+			##key = keyboard.key_pressed()
+			##if key !='':
+				##print(key)
+			#sleep(0.1)
 
 	except KeyboardInterrupt:
 		print('\033[31m\nSystem Stopped!\033[m')

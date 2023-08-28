@@ -60,7 +60,7 @@ class Biometric:
                 draw.text((0,40), '#      PESSOA       #', fill="blue")
                 draw.text((0,50), '#####################', fill="blue")
         self.buzzer.bip()
-        sleep(2)
+        sleep(1.2)
         try:
             util.print_center('## Insira o Dedo no Sensor... ##')
             with self.canvas(self.device) as draw:
@@ -88,8 +88,8 @@ class Biometric:
                     draw.text((0,40),'#  JA SE ENCONTRA   #', fill="blue")
                     draw.text((0,30),'#     REGISTRADA    #', fill="blue")
                     draw.text((0,50),'#####################', fill="blue")
-                    self.buzzer.alarm()
-                    return {"status":"error", "message":error_text, "data":-1}
+                self.buzzer.alarm()
+                return {"status":"error", "message":error_text, "data":-1}
         
             print('## Retire o Dedo... ##')
             with self.canvas(self.device) as draw:
@@ -101,7 +101,6 @@ class Biometric:
                 draw.text((0,40),'#       ###         #', fill="blue")
                 draw.text((0,50),'#####################', fill="blue")
             self.buzzer.alarm()
-            sleep(MIDDLE_TIME)
             print('## Insira o Mesmo Dedo no Sensor... ##')
             with self.canvas(self.device) as draw:
                 draw.rectangle(self.device.bounding_box, outline="white", fill="black")
@@ -130,7 +129,6 @@ class Biometric:
                     draw.text((0,50),'#####################', fill="blue")
                     
                 self.buzzer.alarm()
-                sleep(MIDDLE_TIME)
                 return {"status":"error", "message":error_text, "data":-1}
             
             self.f.createTemplate()
